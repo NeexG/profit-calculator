@@ -224,6 +224,18 @@
             </div>
         </div>
 
+        <div class="calculator-section">
+            <div class="section-title">Pound to KG (+10% Profit)</div>
+            <div class="input-group">
+                <label for="inputLbtokg">Enter Weight (lb):</label>
+                <input type="number" id="inputLbtokg" placeholder="Enter weight in lb" min="0" step="0.01">
+                <div class="result-display empty" id="resultLbtokg">
+                    Result will appear here
+                    <span class="copy-message" id="copyMessageLbtokg">Copied!</span>
+                </div>
+            </div>
+        </div>
+
         <div class="powered-by">
             Powered by <strong><a href="https://www.neexg.com" target="_blank" rel="noopener noreferrer">NeexG</a></strong>
         </div>
@@ -233,8 +245,10 @@
         // Store calculated values and formatted strings
         let calculatedValue10 = null;
         let calculatedValue28 = null;
+        let calculatedValueLbtokg = null;
         let formattedValue10 = null;
         let formattedValue28 = null;
+        let formattedValueLbtokg = null;
 
         // Format number: remove .00 if whole number, otherwise show decimals
         function formatNumber(num) {
@@ -285,6 +299,27 @@
                 formattedValue28 = null;
                 result28.innerHTML = 'Result will appear here<span class="copy-message" id="copyMessage28">Copied!</span>';
                 result28.classList.add('empty');
+            }
+        });
+
+        // Pound to KG (10% Profit)
+        const inputLbtokg = document.getElementById('inputLbtokg');
+        const resultLbtokg = document.getElementById('resultLbtokg');
+        const LB_TO_KG_FACTOR = 0.45359237;
+
+        inputLbtokg.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            if (!isNaN(value) && value >= 0) {
+                // Convert lb to kg first, then add 10%
+                calculatedValueLbtokg = (value * LB_TO_KG_FACTOR) * 1.10;
+                formattedValueLbtokg = formatNumber(calculatedValueLbtokg);
+                resultLbtokg.innerHTML = `Result (kg): ${formattedValueLbtokg}<span class="copy-message" id="copyMessageLbtokg">Copied!</span>`;
+                resultLbtokg.classList.remove('empty');
+            } else {
+                calculatedValueLbtokg = null;
+                formattedValueLbtokg = null;
+                resultLbtokg.innerHTML = 'Result will appear here<span class="copy-message" id="copyMessageLbtokg">Copied!</span>';
+                resultLbtokg.classList.add('empty');
             }
         });
 
@@ -341,6 +376,41 @@
                 // Fallback for older browsers
                 const textArea = document.createElement('textarea');
                 textArea.value = formattedValue28;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    copyMsg.classList.add('show');
+                    setTimeout(() => {
+                        copyMsg.classList.remove('show');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+
+        // Copy functionality for Pound to KG
+        resultLbtokg.addEventListener('click', async function() {
+            if (formattedValueLbtokg === null || resultLbtokg.classList.contains('empty')) {
+                return;
+            }
+
+            const copyMsg = document.getElementById('copyMessageLbtokg');
+
+            try {
+                await navigator.clipboard.writeText(formattedValueLbtokg);
+                copyMsg.classList.add('show');
+                setTimeout(() => {
+                    copyMsg.classList.remove('show');
+                }, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = formattedValueLbtokg;
                 textArea.style.position = 'fixed';
                 textArea.style.opacity = '0';
                 document.body.appendChild(textArea);
